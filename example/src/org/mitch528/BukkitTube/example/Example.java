@@ -1,4 +1,4 @@
-package org.mitch528.BukkitTube;
+package org.mitch528.BukkitTube.example;
 
 import java.io.File;
 import java.util.HashMap;
@@ -12,13 +12,12 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.map.MapView;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.mitch528.BukkitTube.api.VideoSender;
+import org.mitch528.BukkitTube.api.video.FileVideo;
+import org.mitch528.BukkitTube.api.video.Video;
+import org.mitch528.BukkitTube.example.listeners.VideoMapListener;
 
-import org.mitch528.api.VideoSender;
-import org.mitch528.api.video.FileVideo;
-import org.mitch528.api.video.Video;
-import org.mitch528.listeners.VideoMapListener;
-
-public class BukkitTube extends JavaPlugin
+public class Example extends JavaPlugin
 {
 	
 	private HashMap<String, String> videosToPlay;
@@ -127,7 +126,7 @@ public class BukkitTube extends JavaPlugin
 				}
 				else
 				{
-					player.sendMessage("Video is still playing!");	
+					player.sendMessage("Video is still playing!");
 				}
 				
 			}

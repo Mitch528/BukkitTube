@@ -1,4 +1,4 @@
-package org.mitch528.api;
+package org.mitch528.BukkitTube.api;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -9,7 +9,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.map.MapPalette;
 import org.bukkit.map.MapView;
-import org.mitch528.api.video.Video;
+import org.mitch528.BukkitTube.api.video.Video;
 
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
@@ -100,7 +100,6 @@ public class VideoSender
 						}
 						catch (Exception e)
 						{
-							e.printStackTrace();
 						}
 						
 						raw = null;

@@ -1,0 +1,6 @@
+name: BukkitTube
+version: 0.0.1
+description: Bukkit Video Library
+author: Mitch528
+depend: [ProtocolLib]
+main: org.mitch528.BukkitTube.BukkitTube

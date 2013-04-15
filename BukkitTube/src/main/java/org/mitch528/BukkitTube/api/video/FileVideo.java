@@ -1,4 +1,4 @@
-package org.mitch528.api.video;
+package org.mitch528.BukkitTube.api.video;
 
 import java.io.File;
 

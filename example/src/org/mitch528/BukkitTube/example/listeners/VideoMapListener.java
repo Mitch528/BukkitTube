@@ -1,4 +1,4 @@
-package org.mitch528.listeners;
+package org.mitch528.BukkitTube.example.listeners;
 
 import java.io.File;
 
@@ -12,19 +12,19 @@ import org.bukkit.event.server.MapInitializeEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.map.MapRenderer;
-import org.mitch528.BukkitTube.BukkitTube;
-import org.mitch528.api.VideoSender;
-import org.mitch528.api.video.FileVideo;
-import org.mitch528.api.video.Video;
+import org.mitch528.BukkitTube.api.VideoSender;
+import org.mitch528.BukkitTube.api.video.FileVideo;
+import org.mitch528.BukkitTube.api.video.Video;
+import org.mitch528.BukkitTube.example.Example;
 
 public class VideoMapListener implements Listener
 {
 	
-	private BukkitTube bukkitTube;
+	private Example example;
 	
-	public VideoMapListener(BukkitTube bt)
+	public VideoMapListener(Example ex)
 	{
-		bukkitTube = bt;
+		example = ex;
 	}
 	
 	@EventHandler
@@ -39,7 +39,7 @@ public class VideoMapListener implements Listener
 			for (ItemStack is : inv.getContents())
 			{
 				
-				final String vidFile = bukkitTube.getVideosToPlay().get(player.getName());
+				final String vidFile = example.getVideosToPlay().get(player.getName());
 				
 				if (is != null && is.getType() == Material.MAP && is.getDurability() == event.getMap().getId() && vidFile != null && !vidFile.equals(""))
 				{
@@ -49,8 +49,8 @@ public class VideoMapListener implements Listener
 						event.getMap().removeRenderer(r);
 					}
 					
-					bukkitTube.getVideosToPlay().remove(player.getName());
-					bukkitTube.getPreviousVideos().put(event.getMap().getId(), vidFile);
+					example.getVideosToPlay().remove(player.getName());
+					example.getPreviousVideos().put(event.getMap().getId(), vidFile);
 					
 					if (vidFile == null || vidFile.equals(""))
 					{

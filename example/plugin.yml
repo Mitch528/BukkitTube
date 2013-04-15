@@ -1,9 +1,9 @@
-name: BukkitTube
-version: 0.0.1
+name: BukkitTubeExample
 description: Watch videos
 author: Mitch528
-depend: [ProtocolLib]
-main: org.mitch528.BukkitTube.BukkitTube
+depend: [ProtocolLib, BukkitTube]
+main: org.mitch528.BukkitTube.example.Example
+version: 1.0
 commands:
    loadvideo:
       description: Load a video onto a map.
