@@ -9,8 +9,8 @@ import org.bukkit.map.MapPalette;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
 import org.bukkit.map.MinecraftFont;
-import org.mitch528.video.FileVideo;
-import org.mitch528.video.Video;
+import org.mitch528.api.video.FileVideo;
+import org.mitch528.api.video.Video;
 
 public class VideoMapRenderer extends MapRenderer
 {

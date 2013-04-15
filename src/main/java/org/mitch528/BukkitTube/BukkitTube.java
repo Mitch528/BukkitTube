@@ -13,22 +13,23 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.map.MapView;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import org.mitch528.api.VideoSender;
+import org.mitch528.api.video.FileVideo;
+import org.mitch528.api.video.Video;
 import org.mitch528.listeners.VideoMapListener;
-import org.mitch528.video.FileVideo;
-import org.mitch528.video.Video;
 
 public class BukkitTube extends JavaPlugin
 {
 	
 	private HashMap<String, String> videosToPlay;
-	private HashMap<String, String> previousVideoPlayed;
+	private HashMap<Short, String> previousVideoPlayed;
 	
 	@Override
 	public void onEnable()
 	{
 		
 		videosToPlay = new HashMap<String, String>();
-		previousVideoPlayed = new HashMap<String, String>();
+		previousVideoPlayed = new HashMap<Short, String>();
 		
 		getServer().getPluginManager().registerEvents(new VideoMapListener(this), this);
 		
@@ -90,7 +91,9 @@ public class BukkitTube extends JavaPlugin
 		else if (cmd.getName().equalsIgnoreCase("replay"))
 		{
 			
-			String file = previousVideoPlayed.get(player.getName());
+			ItemStack is = player.getInventory().getItemInHand();
+			
+			String file = previousVideoPlayed.get(is.getDurability());
 			
 			if (file == null || file.equals(""))
 			{
@@ -101,23 +104,30 @@ public class BukkitTube extends JavaPlugin
 				
 			}
 			
-			ItemStack is = player.getInventory().getItemInHand();
-			
-			if (is != null && is.getType() == Material.MAP && is.getDurability() == is.getDurability())
+			if (is != null && is.getType() == Material.MAP)
 			{
 				
-				MapView map = Bukkit.getMap(is.getDurability());
-				
-				if (map != null)
+				if (!VideoSender.isMapPlaying(is.getDurability()))
 				{
 					
-					player.sendMessage("Replaying...");
+					MapView map = Bukkit.getMap(is.getDurability());
 					
-					Video vid = new FileVideo(new File(file));
-					vid.start();
+					if (map != null)
+					{
+						
+						player.sendMessage("Replaying...");
+						
+						Video vid = new FileVideo(new File(file));
+						vid.start();
+						
+						VideoSender.startSending(vid, map, player);
+						
+					}
 					
-					VideoSender.startSending(vid, map, player);
-					
+				}
+				else
+				{
+					player.sendMessage("Video is still playing!");	
 				}
 				
 			}
@@ -135,7 +145,7 @@ public class BukkitTube extends JavaPlugin
 		return videosToPlay;
 	}
 	
-	public HashMap<String, String> getPreviousVideos()
+	public HashMap<Short, String> getPreviousVideos()
 	{
 		return previousVideoPlayed;
 	}

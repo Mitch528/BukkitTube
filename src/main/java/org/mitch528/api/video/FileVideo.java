@@ -1,4 +1,4 @@
-package org.mitch528.video;
+package org.mitch528.api.video;
 
 import java.io.File;
 

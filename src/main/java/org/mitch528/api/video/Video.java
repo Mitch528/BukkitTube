@@ -1,4 +1,4 @@
-package org.mitch528.video;
+package org.mitch528.api.video;
 
 import java.awt.image.BufferedImage;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -21,6 +21,7 @@ public abstract class Video
 	private ConcurrentLinkedQueue<BufferedImage> images;
 	
 	private AtomicBoolean isdone;
+	private AtomicBoolean shouldstop;
 	
 	protected String filename;
 	
@@ -28,12 +29,30 @@ public abstract class Video
 	{
 		images = new ConcurrentLinkedQueue<BufferedImage>();
 		isdone = new AtomicBoolean();
+		shouldstop = new AtomicBoolean();
 		isdone.set(false);
+		shouldstop.set(false);
 	}
 	
 	public void start()
 	{
+		shouldstop.set(false);
 		loop();
+	}
+	
+	public void stop()
+	{
+		
+		shouldstop.set(true);
+		
+		for (BufferedImage img : images)
+		{
+			img.flush();
+			img = null;
+		}
+		
+		images.clear();
+		
 	}
 	
 	public BufferedImage getImage()
@@ -43,7 +62,7 @@ public abstract class Video
 	
 	public boolean isDone()
 	{
-		return isdone.get();
+		return isdone.get() || shouldstop.get();
 	}
 	
 	public void loop()
@@ -87,6 +106,9 @@ public abstract class Video
 					if (videoStreamId == -1)
 						throw new RuntimeException("could not find video stream in container: " + filename);
 					
+					videoCoder.setBitRate(16);
+					videoCoder.setBitRateTolerance(2);
+					videoCoder.setFlag(IStreamCoder.Flags.FLAG_QSCALE, false);
 					
 					if (videoCoder.open() < 0)
 						throw new RuntimeException("could not open video decoder for container: " + filename);
@@ -104,8 +126,15 @@ public abstract class Video
 					IPacket packet = IPacket.make();
 					long firstTimestampInStream = Global.NO_PTS;
 					long systemClockStartTime = 0;
+					
 					while (container.readNextPacket(packet) >= 0)
 					{
+						
+						if (shouldstop.get())
+						{
+							break;
+						}
+						
 						if (packet.getStreamIndex() == videoStreamId)
 						{
 							
@@ -114,6 +143,12 @@ public abstract class Video
 							int offset = 0;
 							while (offset < packet.getSize())
 							{
+								
+								if (shouldstop.get())
+								{
+									break;
+								}
+								
 								int bytesDecoded = videoCoder.decodeVideo(picture, packet, offset);
 								if (bytesDecoded < 0)
 									throw new RuntimeException("got error decoding video in: " + filename);
@@ -158,9 +193,16 @@ public abstract class Video
 									
 									BufferedImage javaImage = Utils.videoPictureToImage(newPic);
 									
+									newPic.getData().delete();
+									newPic.delete();
+									
 									images.add(javaImage);
 									
 								}
+								
+								picture.getData().delete();
+								picture.delete();
+								
 							}
 						}
 						else
@@ -172,6 +214,8 @@ public abstract class Video
 						}
 						
 					}
+					
+					packet.delete();
 					
 					if (videoCoder != null)
 					{

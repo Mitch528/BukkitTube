@@ -13,9 +13,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.map.MapRenderer;
 import org.mitch528.BukkitTube.BukkitTube;
-import org.mitch528.BukkitTube.VideoSender;
-import org.mitch528.video.FileVideo;
-import org.mitch528.video.Video;
+import org.mitch528.api.VideoSender;
+import org.mitch528.api.video.FileVideo;
+import org.mitch528.api.video.Video;
 
 public class VideoMapListener implements Listener
 {
@@ -50,7 +50,7 @@ public class VideoMapListener implements Listener
 					}
 					
 					bukkitTube.getVideosToPlay().remove(player.getName());
-					bukkitTube.getPreviousVideos().put(player.getName(), vidFile);
+					bukkitTube.getPreviousVideos().put(event.getMap().getId(), vidFile);
 					
 					if (vidFile == null || vidFile.equals(""))
 					{

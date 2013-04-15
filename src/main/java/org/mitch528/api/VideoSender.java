@@ -1,13 +1,15 @@
-package org.mitch528.BukkitTube;
+package org.mitch528.api;
 
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.map.MapPalette;
 import org.bukkit.map.MapView;
-import org.mitch528.video.Video;
+import org.mitch528.api.video.Video;
 
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
@@ -18,8 +20,22 @@ public class VideoSender
 	
 	private static ProtocolManager manager = ProtocolLibrary.getProtocolManager();
 	
+	private static List<Short> mapsCurrentlyPlaying;
+	
+	static
+	{
+		mapsCurrentlyPlaying = Collections.synchronizedList(new ArrayList<Short>());
+	}
+	
+	public static boolean isMapPlaying(short id)
+	{
+		return mapsCurrentlyPlaying.contains(id);
+	}
+	
 	public static void startSending(final Video vid, final MapView map, final Player player)
 	{
+		
+		mapsCurrentlyPlaying.add(map.getId());
 		
 		new Thread(new Runnable()
 		{
@@ -35,12 +51,12 @@ public class VideoSender
 					
 					if (vid.isDone())
 					{
+						
+						if (mapsCurrentlyPlaying.contains(map.getId()))
+							mapsCurrentlyPlaying.remove(mapsCurrentlyPlaying.indexOf(map.getId()));
+						
 						return;
-					}
-					
-					if (!Bukkit.getPlayer(player.getName()).isOnline())
-					{
-						return;
+						
 					}
 					
 					img = vid.getImage();
@@ -54,6 +70,9 @@ public class VideoSender
 					
 					img.flush();
 					newImg.flush();
+					
+					img = null;
+					newImg = null;
 					
 					for (int col = 0; col < 128; ++col)
 					{
