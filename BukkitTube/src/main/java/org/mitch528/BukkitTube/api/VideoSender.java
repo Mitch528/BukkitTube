@@ -1,5 +1,6 @@
 package org.mitch528.BukkitTube.api;
 
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,8 +50,19 @@ public class VideoSender
 				while (true)
 				{
 					
+					if (!player.isOnline())
+					{
+						
+						vid.stop();
+						
+						return;
+						
+					}
+					
 					if (vid.isDone())
 					{
+						
+						vid.stop();
 						
 						if (mapsCurrentlyPlaying.contains(map.getId()))
 							mapsCurrentlyPlaying.remove(mapsCurrentlyPlaying.indexOf(map.getId()));
@@ -64,15 +76,25 @@ public class VideoSender
 					if (img == null)
 						continue;
 					
-					BufferedImage newImg = MapPalette.resizeImage(img);
+					//					BufferedImage newImg = MapPalette.resizeImage(img);
 					
-					byte[] data = MapPalette.imageToBytes(newImg);
+					/**
+					 * https://github.com/Bukkit/Bukkit/blob/master/src/main/java/org/bukkit/map/MapPalette.java
+					 */
+					
+					int[] pixels = new int[img.getWidth() * img.getHeight()];
+					img.getRGB(0, 0, img.getWidth(), img.getHeight(), pixels, 0, img.getWidth());
+					
+					byte[] data = new byte[img.getWidth() * img.getHeight()];
+					
+					for (int i = 0; i < pixels.length; i++)
+					{
+						data[i] = MapPalette.matchColor(new Color(pixels[i], true));
+					}
 					
 					img.flush();
-					newImg.flush();
 					
 					img = null;
-					newImg = null;
 					
 					for (int col = 0; col < 128; ++col)
 					{
@@ -100,6 +122,14 @@ public class VideoSender
 						}
 						catch (Exception e)
 						{
+							
+							vid.stop();
+							
+							raw = null;
+							data = null;
+							
+							return;
+							
 						}
 						
 						raw = null;

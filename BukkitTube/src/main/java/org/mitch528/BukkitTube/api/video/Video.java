@@ -1,7 +1,9 @@
 package org.mitch528.BukkitTube.api.video;
 
 import java.awt.image.BufferedImage;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.xuggle.xuggler.Global;
@@ -14,11 +16,15 @@ import com.xuggle.xuggler.IStreamCoder;
 import com.xuggle.xuggler.IVideoPicture;
 import com.xuggle.xuggler.IVideoResampler;
 import com.xuggle.xuggler.Utils;
+import com.xuggle.xuggler.video.ArgbConverter;
+import com.xuggle.xuggler.video.IConverter;
 
 public abstract class Video
 {
 	
-	private ConcurrentLinkedQueue<BufferedImage> images;
+	private BlockingQueue<BufferedImage> images;
+	
+	private Object imageLock = new Object();
 	
 	private AtomicBoolean isdone;
 	private AtomicBoolean shouldstop;
@@ -27,7 +33,7 @@ public abstract class Video
 	
 	public Video()
 	{
-		images = new ConcurrentLinkedQueue<BufferedImage>();
+		images = new LinkedBlockingQueue<BufferedImage>();
 		isdone = new AtomicBoolean();
 		shouldstop = new AtomicBoolean();
 		isdone.set(false);
@@ -45,10 +51,13 @@ public abstract class Video
 		
 		shouldstop.set(true);
 		
-		for (BufferedImage img : images)
+		synchronized (imageLock)
 		{
-			img.flush();
-			img = null;
+			for (BufferedImage img : images)
+			{
+				img.flush();
+				img = null;
+			}
 		}
 		
 		images.clear();
@@ -191,12 +200,18 @@ public abstract class Video
 										}
 									}
 									
-									BufferedImage javaImage = Utils.videoPictureToImage(newPic);
+									IConverter con = new ArgbConverter(IPixelFormat.Type.BGR24, newPic.getWidth(), newPic.getHeight(), 128, 128);
+									
+									BufferedImage javaImage = con.toImage(newPic);
+									
+									//									BufferedImage javaImage = Utils.videoPictureToImage(newPic);
 									
 									newPic.getData().delete();
 									newPic.delete();
+									con.delete();
 									
-									images.add(javaImage);
+									if (!shouldstop.get())
+										images.add(javaImage);
 									
 								}
 								
