@@ -9,6 +9,7 @@ import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.map.MapPalette;
+import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
 import org.mitch528.BukkitTube.api.video.Video;
 
@@ -35,6 +36,11 @@ public class VideoSender
 	
 	public static void startSending(final Video vid, final MapView map, final Player player)
 	{
+		
+		for (MapRenderer r : map.getRenderers())
+		{
+			map.removeRenderer(r);
+		}
 		
 		mapsCurrentlyPlaying.add(map.getId());
 		

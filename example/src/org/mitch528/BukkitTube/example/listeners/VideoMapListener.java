@@ -44,11 +44,6 @@ public class VideoMapListener implements Listener
 				if (is != null && is.getType() == Material.MAP && is.getDurability() == event.getMap().getId() && vidFile != null && !vidFile.equals(""))
 				{
 					
-					for (MapRenderer r : event.getMap().getRenderers())
-					{
-						event.getMap().removeRenderer(r);
-					}
-					
 					example.getVideosToPlay().remove(player.getName());
 					example.getPreviousVideos().put(event.getMap().getId(), vidFile);
 					
